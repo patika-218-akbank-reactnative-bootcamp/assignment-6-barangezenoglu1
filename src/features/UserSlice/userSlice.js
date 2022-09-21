@@ -6,12 +6,12 @@ const userSlice = createSlice({
     user: null,
   },
   reducers: {
-    setUser: (state, action) => {
+    setActiveUser: (state, action) => {
       return {
-        theme: action.payload,
+        user: action.payload,
       };
     },
   },
 });
-export const {setUser} = userSlice.actions;
+export const {setActiveUser} = userSlice.actions;
 export default userSlice.reducer;
