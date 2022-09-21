@@ -10,7 +10,7 @@ export const MainScreens = () => {
     if (route.name === "Home") {
       return <Ionicons name="md-home-outline" size={30} color={"black"} />;
     } else if (route.name === "Search") {
-      return <Ionicons name="search-outline" size={30} color={"black"} />;
+      return <Ionicons name="map-outline" size={30} color={"black"} />;
     } else if (route.name === "Profile") {
       return <Ionicons name="settings-outline" size={30} color={"black"} />;
     }
