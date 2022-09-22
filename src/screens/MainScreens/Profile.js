@@ -8,17 +8,43 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setTheme } from "../../features/ThemeSlice/themeSlice";
 import { darkTheme, lightTheme } from "../../data/theme";
 import { firebase } from "@react-native-firebase/auth";
+import storage from "@react-native-firebase/storage";
 import { setActiveUser } from "../../features/UserSlice/userSlice";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 export const Profile = ({ navigation }) => {
-console.log(firebase.auth().currentUser)
+console.log('currentUser', firebase.auth().currentUser)
   const activeUser = useSelector((state) => state.user);
   const themeColors = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [downloadURL, setDownloadURL] = useState();
+  console.log('downloadURL', downloadURL)
+  const [uploadTask, setUploadTask] = useState();
+  const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
   const [editedUser, setEditedUser] = useState({
     userEmail: activeUser.user.userEmail,
     userPassword: activeUser.user.userPassword,
   });
   const [isEnabled, setIsEnabled] = useState(false);
+  const onMediaSelect = async (media) => {
+    if (!media.didCancel) {
+      setIsUploading(true);
+      const ref = storage().ref(media.assets[0].fileName);
+      const task = ref.putFile(media.assets[0].uri);
+      setUploadTask(task);
+      task.on("state_changed", (taskSnapShot) => {
+        setUploadTaskSnapshot(taskSnapShot);
+      });
+
+      task.then(async () => {
+        const downloadURL = await ref.getDownloadURL();
+        setDownloadURL(downloadURL);
+        setIsUploading(false);
+        setUploadTaskSnapshot({});
+      });
+    }
+  };
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
   const setUserAsyncStorage = async (value) => {
     try {
@@ -34,6 +60,12 @@ console.log(firebase.auth().currentUser)
     } catch (e) {
       // remove error
     }
+  };
+  const handleTakePhoto = () => {
+    launchCamera({ mediaType: "photo" }, onMediaSelect);
+  };
+  const handleSelectPhoto = () => {
+    launchImageLibrary({ mediaType: "image" }, onMediaSelect);
   };
   const handleConfirm = async () => {
    await firebase.auth().currentUser.updateEmail(editedUser.userEmail);
@@ -55,7 +87,11 @@ console.log(firebase.auth().currentUser)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEnabled]);
-
+useEffect(() => {
+  firebase.auth().currentUser.updateProfile({
+    photoURL: downloadURL
+  })
+}, [downloadURL])
   return (
     <View style={styles.container(themeColors)}>
       <View style={styles.darkModeContainer}>
@@ -72,7 +108,21 @@ console.log(firebase.auth().currentUser)
         />
       </View>
       <View style={styles.settingsContainer}>
-        <Image source={ProfilePhoto} style={styles.profilePhoto} />
+      <Image source={{uri: firebase.auth().currentUser.photoURL}} style={styles.profilePhoto} />
+        <View style={styles.editPpButtonsContainer}>
+        <CustomButton
+          title={"Select from library"}
+          buttonContainerStyle={styles.editPpButtons(themeColors)}
+          buttonTextStyle={styles.buttonText(themeColors)}
+          onPress={handleSelectPhoto}
+        />
+        <CustomButton
+          title={"Take a photo"}
+          buttonContainerStyle={styles.editPpButtons(themeColors)}
+          buttonTextStyle={styles.buttonText(themeColors)}
+          onPress={handleTakePhoto}
+        />
+        </View>
         <TextInput
           style={styles.textInput}
           placeholder="Change your email"
@@ -167,13 +217,19 @@ const styles = StyleSheet.create({
       borderRadius: 20,
     };
   },
-  /*  confirmButtonContainer: {
-    marginTop: 20,
-    height: 50,
-    width: 150,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
-  }, */
+  editPpButtonsContainer: {
+    flexDirection: 'row',
+    bottom: 20
+  },
+  editPpButtons: function (mode) {
+    return {
+      height: 55,
+      width: 130,
+      marginRight: 10,
+      backgroundColor: mode.theme.black,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 20,
+    }
+  }
 });
