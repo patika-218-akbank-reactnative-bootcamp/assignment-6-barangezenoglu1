@@ -13,10 +13,8 @@ export const Home = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [downloadURL, setDownloadURL] = useState();
-  console.log("downloadURL", downloadURL);
   const [uploadTask, setUploadTask] = useState();
   const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
-  console.log("isUploading", isUploading);
   const onMediaSelect = async (media) => {
     if (!media.didCancel) {
       setIsUploading(true);
