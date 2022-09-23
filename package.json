@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-firebase/app": "^15.6.0",
     "@react-native-firebase/auth": "^15.6.0",
+    "@react-native-firebase/firestore": "^15.6.0",
     "@react-native-firebase/storage": "^15.6.0",
     "@react-navigation/bottom-tabs": "^6.4.0",
     "@react-navigation/native": "^6.0.13",
@@ -29,7 +30,8 @@
     "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.18.7",
     "react-redux": "^8.0.2",
-    "redux": "^4.2.0"
+    "redux": "^4.2.0",
+    "react-native-maps": "0.31.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

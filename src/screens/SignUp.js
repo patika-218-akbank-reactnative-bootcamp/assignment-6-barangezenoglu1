@@ -10,6 +10,7 @@ import {
 import LoginBackground from "../assets/LoginBackground.png";
 import { CustomButton } from "../components/CustomButton";
 import auth from "@react-native-firebase/auth";
+import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const windowWidth = Dimensions.get("window").width;
@@ -34,6 +35,10 @@ export const SignUp = ({ navigation }) => {
         registerInfo.userMail,
         registerInfo.userPassword
       )
+      .then(cred => {return firestore().collection('users').doc(cred.user.uid).set({
+        email: registerInfo.userMail,
+        photoURL: cred.user.photoURL
+      })})
       .then(setUserAsyncStorage(registerInfo))
       .then(() => navigation.navigate("MainScreens", { screen: "Home" }))
       .catch((err) => console.log(err));
