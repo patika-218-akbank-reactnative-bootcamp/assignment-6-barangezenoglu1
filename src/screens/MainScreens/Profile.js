@@ -15,7 +15,6 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 export const Profile = ({ navigation }) => {
   const activeUser = useSelector((state) => state.user);
   const themeColors = useSelector((state) => state.theme);
-  console.log('aaa', firebase.auth().currentUser.uid)
   const dispatch = useDispatch();
   const [isUploading, setIsUploading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
