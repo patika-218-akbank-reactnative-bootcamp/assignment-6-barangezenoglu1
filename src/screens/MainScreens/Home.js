@@ -9,6 +9,7 @@ import { CustomButton } from "../../components/CustomButton";
 
 export const Home = () => {
   const dispatch = useDispatch();
+  const themeColors = useSelector((state) => state.theme);
   const asyncStorageValue = useGetsyncStorageValue("registeredUser");
   const [isUploading, setIsUploading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -46,17 +47,17 @@ export const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asyncStorageValue]);
   return (
-    <View style={styles.container}>
+    <View style={styles.container(themeColors)}>
       <CustomButton
         title={"Select from library"}
-        buttonContainerStyle={styles.buttons}
-        buttonTextStyle={styles.buttonTexts}
+        buttonContainerStyle={styles.buttons(themeColors)}
+        buttonTextStyle={styles.buttonTexts(themeColors)}
         onPress={handleSelectPhoto}
       />
       <CustomButton
         title={"Take a picture"}
-        buttonContainerStyle={styles.buttons}
-        buttonTextStyle={styles.buttonTexts}
+        buttonContainerStyle={styles.buttons(themeColors)}
+        buttonTextStyle={styles.buttonTexts(themeColors)}
         onPress={handleTakePhoto}
       />
     </View>
@@ -64,23 +65,30 @@ export const Home = () => {
 };
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  container: function (mode) {
+    return {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: mode.theme.white,
+    };
   },
-  buttons: {
-    marginTop: 20,
-    height: 250,
-    width: 250,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 10,
-    backgroundColor: "red",
+  buttons: function (mode) {
+    return {
+      marginTop: 20,
+      height: 250,
+      width: 250,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 10,
+      backgroundColor: mode.theme.black,
+    };
   },
-  buttonTexts: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "black",
+  buttonTexts: function (mode) {
+    return {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: mode.theme.white,
+    };
   },
 });
