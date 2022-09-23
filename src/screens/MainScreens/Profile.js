@@ -7,19 +7,19 @@ import { CustomButton } from "../../components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setTheme } from "../../features/ThemeSlice/themeSlice";
 import { darkTheme, lightTheme } from "../../data/theme";
+import firestore from "@react-native-firebase/firestore";
 import { firebase } from "@react-native-firebase/auth";
 import storage from "@react-native-firebase/storage";
 import { setActiveUser } from "../../features/UserSlice/userSlice";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 export const Profile = ({ navigation }) => {
-console.log('currentUser', firebase.auth().currentUser)
   const activeUser = useSelector((state) => state.user);
   const themeColors = useSelector((state) => state.theme);
+  console.log('aaa', firebase.auth().currentUser.uid)
   const dispatch = useDispatch();
   const [isUploading, setIsUploading] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [downloadURL, setDownloadURL] = useState();
-  console.log('downloadURL', downloadURL)
   const [uploadTask, setUploadTask] = useState();
   const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
   const [editedUser, setEditedUser] = useState({
@@ -62,14 +62,18 @@ console.log('currentUser', firebase.auth().currentUser)
     }
   };
   const handleTakePhoto = () => {
-    launchCamera({ mediaType: "photo" }, onMediaSelect);
+    launchCamera({ mediaType: "image" }, onMediaSelect);
   };
   const handleSelectPhoto = () => {
     launchImageLibrary({ mediaType: "image" }, onMediaSelect);
   };
   const handleConfirm = async () => {
-   await firebase.auth().currentUser.updateEmail(editedUser.userEmail);
-   await firebase.auth().currentUser.updatePassword(editedUser.userPassword);
+    await firebase.auth().currentUser.updateEmail(editedUser.userEmail);
+    await firebase.auth().currentUser.updatePassword(editedUser.userPassword);
+    await firestore().collection("users").doc(firebase.auth().currentUser.uid).update({
+      email: firebase.auth().currentUser.email,
+      photoURL: firebase.auth().currentUser.photoURL,
+    });
     setUserAsyncStorage(editedUser);
     dispatch(setActiveUser(editedUser));
     navigation.navigate("SignIn");
@@ -87,11 +91,11 @@ console.log('currentUser', firebase.auth().currentUser)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEnabled]);
-useEffect(() => {
-  firebase.auth().currentUser.updateProfile({
-    photoURL: downloadURL
-  })
-}, [downloadURL])
+  useEffect(() => {
+    firebase.auth().currentUser.updateProfile({
+      photoURL: downloadURL,
+    });
+  }, [downloadURL]);
   return (
     <View style={styles.container(themeColors)}>
       <View style={styles.darkModeContainer}>
@@ -108,20 +112,23 @@ useEffect(() => {
         />
       </View>
       <View style={styles.settingsContainer}>
-      <Image source={{uri: firebase.auth().currentUser.photoURL}} style={styles.profilePhoto} />
+        <Image
+          source={{ uri: firebase.auth().currentUser.photoURL }}
+          style={styles.profilePhoto}
+        />
         <View style={styles.editPpButtonsContainer}>
-        <CustomButton
-          title={"Select from library"}
-          buttonContainerStyle={styles.editPpButtons(themeColors)}
-          buttonTextStyle={styles.buttonText(themeColors)}
-          onPress={handleSelectPhoto}
-        />
-        <CustomButton
-          title={"Take a photo"}
-          buttonContainerStyle={styles.editPpButtons(themeColors)}
-          buttonTextStyle={styles.buttonText(themeColors)}
-          onPress={handleTakePhoto}
-        />
+          <CustomButton
+            title={"Select from library"}
+            buttonContainerStyle={styles.editPpButtons(themeColors)}
+            buttonTextStyle={styles.buttonText(themeColors)}
+            onPress={handleSelectPhoto}
+          />
+          <CustomButton
+            title={"Take a photo"}
+            buttonContainerStyle={styles.editPpButtons(themeColors)}
+            buttonTextStyle={styles.buttonText(themeColors)}
+            onPress={handleTakePhoto}
+          />
         </View>
         <TextInput
           style={styles.textInput}
@@ -218,18 +225,18 @@ const styles = StyleSheet.create({
     };
   },
   editPpButtonsContainer: {
-    flexDirection: 'row',
-    bottom: 20
+    flexDirection: "row",
+    bottom: 20,
   },
   editPpButtons: function (mode) {
     return {
       height: 55,
-      width: 130,
+      width: 150,
       marginRight: 10,
       backgroundColor: mode.theme.black,
       alignItems: "center",
       justifyContent: "center",
       borderRadius: 20,
-    }
-  }
+    };
+  },
 });
