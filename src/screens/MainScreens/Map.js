@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Dimensions, StyleSheet, Image } from "react-native";
+import { View, Dimensions, StyleSheet, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { firebase } from "@react-native-firebase/auth";
 

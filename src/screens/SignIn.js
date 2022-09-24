@@ -21,7 +21,7 @@ export const SignIn = ({ navigation }) => {
     loginEmail: "",
     loginPassword: "",
   });
-  const asyncValue = useGetsyncStorageValue('registeredUser');
+  const asyncValue = useGetsyncStorageValue("registeredUser");
   const setUserAsyncStorage = async (value) => {
     try {
       const jsonValue = JSON.stringify(value);
@@ -39,9 +39,9 @@ export const SignIn = ({ navigation }) => {
   };
   useEffect(() => {
     if (asyncValue?.length > 0) {
-      return navigation.navigate('MainScreens', {screen: 'Home'})
+      return navigation.navigate("MainScreens", { screen: "Home" });
     }
-  }, [asyncValue])
+  }, [asyncValue]);
   return (
     <View style={styles.container}>
       <ImageBackground source={LoginBackground} style={styles.background}>
@@ -72,7 +72,7 @@ export const SignIn = ({ navigation }) => {
             buttonTextStyle={styles.buttonText}
             onPress={handleSignIn}
           />
-          <Text style={styles.registerText}>Don't have an account?</Text>
+          <Text style={styles.registerText}>{"Don't have an account?"}</Text>
           <CustomButton
             title={"Register For Patika Gallery"}
             buttonContainerStyle={styles.registerButtonContainer}

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Switch, TextInput, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import ProfilePhoto from "../../assets/baranProfilePhoto.png";
 import { CustomButton } from "../../components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setTheme } from "../../features/ThemeSlice/themeSlice";
@@ -16,8 +15,6 @@ export const Profile = ({ navigation }) => {
   const activeUser = useSelector((state) => state.user);
   const themeColors = useSelector((state) => state.theme);
   const dispatch = useDispatch();
-  const [isUploading, setIsUploading] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [downloadURL, setDownloadURL] = useState();
   const [uploadTask, setUploadTask] = useState();
   const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
@@ -28,7 +25,6 @@ export const Profile = ({ navigation }) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const onMediaSelect = async (media) => {
     if (!media.didCancel) {
-      setIsUploading(true);
       const ref = storage().ref(media.assets[0].fileName);
       const task = ref.putFile(media.assets[0].uri);
       setUploadTask(task);
@@ -39,7 +35,6 @@ export const Profile = ({ navigation }) => {
       task.then(async () => {
         const downloadURL = await ref.getDownloadURL();
         setDownloadURL(downloadURL);
-        setIsUploading(false);
         setUploadTaskSnapshot({});
       });
     }
@@ -69,10 +64,13 @@ export const Profile = ({ navigation }) => {
   const handleConfirm = async () => {
     await firebase.auth().currentUser.updateEmail(editedUser.userEmail);
     await firebase.auth().currentUser.updatePassword(editedUser.userPassword);
-    await firestore().collection("users").doc(firebase.auth().currentUser.uid).update({
-      email: firebase.auth().currentUser.email,
-      photoURL: firebase.auth().currentUser.photoURL,
-    });
+    await firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .update({
+        email: firebase.auth().currentUser.email,
+        photoURL: firebase.auth().currentUser.photoURL,
+      });
     setUserAsyncStorage(editedUser);
     dispatch(setActiveUser(editedUser));
     navigation.navigate("SignIn");
