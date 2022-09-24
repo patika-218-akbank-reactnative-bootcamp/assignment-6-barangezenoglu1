@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetsyncStorageValue } from "../../hooks/getAsyncStorageValue";
 import { setActiveUser } from "../../features/UserSlice/userSlice";
@@ -11,14 +11,12 @@ export const Home = () => {
   const dispatch = useDispatch();
   const themeColors = useSelector((state) => state.theme);
   const asyncStorageValue = useGetsyncStorageValue("registeredUser");
-  const [isUploading, setIsUploading] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [downloadURL, setDownloadURL] = useState();
   const [uploadTask, setUploadTask] = useState();
   const [uploadTaskSnapshot, setUploadTaskSnapshot] = useState({});
+
   const onMediaSelect = async (media) => {
     if (!media.didCancel) {
-      setIsUploading(true);
       const ref = storage().ref(media.assets[0].fileName);
       const task = ref.putFile(media.assets[0].uri);
       setUploadTask(task);
@@ -29,7 +27,6 @@ export const Home = () => {
       task.then(async () => {
         const downloadURL = await ref.getDownloadURL();
         setDownloadURL(downloadURL);
-        setIsUploading(false);
         setUploadTaskSnapshot({});
       });
     }
